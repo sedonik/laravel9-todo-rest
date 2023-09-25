@@ -12,11 +12,6 @@ It's implemented a simple Rest API Endpoint "/tasks":
 
 ### Here is a list of CLI commands that have to be run after the repository is downloaded:
 ```
-php artisan make:model Task --migration
-php artisan make:factory Task
-php artisan make:controller TaskController --api --model=Task
-php artisan make:resource TaskResource
-php artisan make:resource TaskCollection
 php artisan migrate
 php artisan db:seed
 ```
