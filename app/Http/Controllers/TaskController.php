@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InputException;
+use App\Exceptions\TaskNotFoundException;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
+use App\Interfaces\TaskInterface;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * class TaskController
@@ -15,26 +17,16 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class TaskController extends Controller
 {
     /**
-     * @var numeric
+     * @var TaskInterface
      */
-    public $userId = 0;
+    private $taskInterface;
 
     /**
-     * @var Session
+     * @param TaskInterface $taskInterface
      */
-    protected $session;
-
-    /**
-     * Authenticate constructor.
-     *
-     * @param Session $session
-     */
-    public function __construct(
-        Session $session
-    ) {
-        $this->session = $session;
-
-        $this->userId = $this->session->get('user_id');
+    public function __construct(TaskInterface $taskInterface)
+    {
+        $this->taskInterface = $taskInterface;
     }
 
     /**
@@ -42,17 +34,17 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $userId = $this->userId;
+        try {
+            $tasks = $this->taskInterface->getAll($request->only(['filter', 'sort']));
+        } catch (InputException $inputException) {
+            return response()->json(json_decode($inputException->getMessage()), 400);
+        } catch (TaskNotFoundException $notFoundException) {
+            return response()->json($notFoundException->getMessage(), 404);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
 
-        $tasks = Task::findAll($request->only([
-            'filter',
-            'sort'
-        ]), $userId);
-
-        $tasksCollection = new TaskCollection($tasks);
-
-
-        return response()->json($tasksCollection, Response::HTTP_OK);
+        return new TaskCollection($tasks);
     }
 
     /**
@@ -60,15 +52,15 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $params = $request->only([
-           'status', 'priority', 'title', 'description', 'created_at', 'completed_at'
-        ]);
+        try {
+            $task = $this->taskInterface->create($request->only(['title', 'parent_task_id', 'description']));
+        } catch (InputException $inputException) {
+            return response()->json(json_decode($inputException->getMessage()), 400);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
 
-        $params['user_id'] = $this->userId;
-
-        $task = Task::create($params);
-
-        return new TaskResource($task);
+        return response()->json(new TaskResource($task), 201);
     }
 
     /**
@@ -76,9 +68,15 @@ class TaskController extends Controller
      */
     public function show($taskId)
     {
-        $userId = $this->userId;
-
-        $task = Task::getTask($taskId, $userId);
+        try {
+            $task = $this->taskInterface->getOne($taskId);
+        } catch (InputException $inputException) {
+            return response()->json($inputException->getMessage(), 400);
+        } catch (TaskNotFoundException $notFoundException) {
+            return response()->json($notFoundException->getMessage(), 404);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
 
         return new TaskResource($task);
     }
@@ -88,15 +86,17 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        $params = $request->only([
-            'status', 'priority', 'title', 'description', 'created_at', 'completed_at'
-        ]);
+        try{
+            $task = $this->taskInterface->update($request->only(['title', 'description']), $task->getOriginal('id'));
+        } catch (InputException $inputException) {
+            return response()->json($inputException->getMessage(), 400);
+        } catch (TaskNotFoundException $notFoundException) {
+            return response()->json($notFoundException->getMessage(), 404);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
 
-        $params['user_id'] = $this->userId;
-
-        $task->update($params);
-
-        return new TaskResource($task);
+        return response()->json(new TaskResource($task), 200);
     }
 
     /**
@@ -104,10 +104,16 @@ class TaskController extends Controller
      */
     public function destroy($taskId)
     {
-        $userId = $this->userId;
+        try{
+            $this->taskInterface->delete($taskId);
+        } catch (InputException $inputException) {
+            return response()->json($inputException->getMessage(), 400);
+        } catch (TaskNotFoundException $notFoundException) {
+            return response()->json($notFoundException->getMessage(), 404);
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
 
-        Task::deleteTask($taskId, $userId);
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return response()->json(null, 204);
     }
 }

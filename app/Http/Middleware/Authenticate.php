@@ -37,16 +37,12 @@ class Authenticate extends Middleware
      */
     public function handle($request, Closure $next, ...$guards)
     {
-        $credentials = $request->only('email', 'password');
-
-        if(!Auth::once($credentials)) {
+        if(!Auth::once(['email' => $request->getUser(), 'password' => $request->getPassword()])) {
             $headers = array('WWW-Authenticate' => 'Basic');
             return response('Password is not correct', 401, $headers);
         }
 
-        $user = Auth::getUser();
-
-        $this->session->set('user_id', $user->id);
+        $this->session->set('user_id', Auth::getUser()->id);
 
         return $next($request);
     }
