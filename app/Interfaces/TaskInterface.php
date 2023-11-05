@@ -2,39 +2,44 @@
 
 namespace App\Interfaces;
 
+use App\Models\Task;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+
 /**
  * interface TaskInterface
  */
 interface TaskInterface
 {
     /**
-     * @param $taskId
-     * @return task
+     * @param int $taskId
+     * @return Task|Exception
      */
-    public function getOne(int $taskId);
+    public function getOne(int $taskId): Task | Exception;
 
     /**
-     * @param $request
-     * @return task
+     * @param array $request
+     * @return Task|Exception
      */
-    public function create($request);
+    public function create(array $request): Task | Exception;
 
     /**
-     * @param $request
-     * @param $taskId
-     * @return task
+     * @param array $request
+     * @param int $taskId
+     * @return Task|Exception
      */
-    public function update($request, $taskId);
+    public function update(array $request, int $taskId): Task | Exception;
 
     /**
-     * @param $taskId
+     * @param int $taskId
      * @return void
      */
-    public function delete($taskId);
+    public function delete(int $taskId): void;
 
     /**
-     * @param $request
-     * @return tasks
+     * @param array $request
+     * @return Collection|Exception
      */
-    public function getAll($request);
+    public function getAll(array $request): Collection | Exception;
 }

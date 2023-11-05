@@ -9,7 +9,7 @@ use App\Http\Resources\TaskResource;
 use App\Interfaces\TaskInterface;
 use App\Models\Task;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 
 /**
  * class TaskController
@@ -30,9 +30,10 @@ class TaskController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @param Request $request
+     * @return TaskCollection | JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request): TaskCollection | JsonResponse
     {
         try {
             $tasks = $this->taskInterface->getAll($request->only(['filter', 'sort']));
@@ -49,8 +50,11 @@ class TaskController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         try {
             $task = $this->taskInterface->create($request->only(['title', 'parent_task_id', 'description']));
@@ -65,8 +69,11 @@ class TaskController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @param int $taskId
+     * @return TaskResource|JsonResponse
      */
-    public function show($taskId)
+    public function show(int $taskId): TaskResource | JsonResponse
     {
         try {
             $task = $this->taskInterface->getOne($taskId);
@@ -83,11 +90,15 @@ class TaskController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param Request $request
+     * @param Task $task
+     * @return JsonResponse
      */
-    public function update(Request $request, Task $task)
+    public function update(Request $request, Task $task): JsonResponse
     {
         try{
-            $task = $this->taskInterface->update($request->only(['title', 'description']), $task->getOriginal('id'));
+            $task = $this->taskInterface->update($request->only(['title', 'description', 'status', 'priority']), $task->getOriginal('id'));
         } catch (InputException $inputException) {
             return response()->json($inputException->getMessage(), 400);
         } catch (TaskNotFoundException $notFoundException) {
@@ -101,8 +112,11 @@ class TaskController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @param int $taskId
+     * @return JsonResponse
      */
-    public function destroy($taskId)
+    public function destroy(int $taskId): JsonResponse
     {
         try{
             $this->taskInterface->delete($taskId);

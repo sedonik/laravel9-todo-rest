@@ -38,6 +38,10 @@ class Handler extends ExceptionHandler
             return response()->json($exception->getMessage(), 404);
         }
 
+        if ($exception instanceof \TypeError) {
+            return response()->json($exception->getMessage(), 404);
+        }
+
         return parent::render($request, $exception);
     }
 }

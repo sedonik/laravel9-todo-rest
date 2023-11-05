@@ -13,7 +13,8 @@ class TaskResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+     * @param Request $request
+     * @return array
      */
     public function toArray(Request $request): array
     {
@@ -21,7 +22,7 @@ class TaskResource extends JsonResource
             'id' => $this->id,
             'status' => $this->status,
             'priority' => $this->priority,
-            'title' =>ucwords($this->title),
+            'title' => ucwords($this->title),
             'description' => $this->description,
             'created_at' => $this->created_at,
             'completed_at' => $this->completed_at

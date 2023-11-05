@@ -13,7 +13,8 @@ class TaskCollection extends ResourceCollection
     /**
      * Transform the resource collection into an array.
      *
-     * @return array<int|string, mixed>
+     * @param Request $request
+     * @return array
      */
     public function toArray(Request $request): array
     {

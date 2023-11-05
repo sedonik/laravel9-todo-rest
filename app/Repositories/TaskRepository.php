@@ -2,12 +2,17 @@
 
 namespace App\Repositories;
 
+use App\Enums\TaskStatus;
 use App\Exceptions\TaskNotFoundException;
 use App\Interfaces\TaskInterface;
 use App\Models\Task;
 use Symfony\Component\HttpFoundation\Session\Session;
 use App\Exceptions\InputException;
 use Illuminate\Support\Facades\Validator;
+use App\Enums\TaskStatusEnum;
+use App\Enums\TaskPriorityEnum;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * class TaskRepository
@@ -37,7 +42,7 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function create($request)
+    public function create(array $request): Task | Exception
     {
         $validator = Validator::make($request, [
             'title' => "required|string|min:1|max:255",
@@ -55,7 +60,7 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function getOne($taskId)
+    public function getOne(int $taskId): Task | Exception
     {
         $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1|max:1000000"]);
         if ($validator->fails()) {
@@ -76,11 +81,17 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function update($request, $taskId)
+    public function update(array $request, int $taskId): Task | Exception
     {
-        $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1|max:1000000"]);
+        $validator = Validator::make(array_merge($request, ['task_id' => $taskId]), [
+            'task_id' => "required|integer|min:1|max:1000000",
+            'title' => "required|string|min:1|max:255",
+            'description' => "required|string|min:1|max:2000",
+            'status' => "string|in:" . new TaskStatusEnum(),
+            'priority' => "string|in:" . new TaskPriorityEnum()
+        ]);
         if ($validator->fails()) {
-            throw new InputException($validator->errors()->first('task_id'));
+            throw new InputException($validator->errors());
         }
 
         $task = Task::where('id', '=', $taskId)
@@ -93,6 +104,8 @@ class TaskRepository implements TaskInterface
 
         $task['title'] = $request['title'];
         $task['description'] = $request['description'];
+        $task['status'] = $request['status'];
+        $task['priority'] = $request['priority'];
         $task->save();
 
         return $task;
@@ -101,7 +114,7 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function delete($taskId)
+    public function delete(int $taskId): void
     {
         $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1|max:1000000"]);
         if ($validator->fails()) {
@@ -116,20 +129,20 @@ class TaskRepository implements TaskInterface
             throw new TaskNotFoundException("Task: {$taskId} was not found for User: {$this->userId}");
         }
 
-        return $task->delete();
+        $task->delete();
     }
 
     /**
      * @inheritdoc
      */
-    public function getAll($request)
+    public function getAll(array $request): Collection | Exception
     {
         $validator = Validator::make($request, [
-            'filter.status' => "string|in:todo,done",
+            'filter.status' => "string|in:" . new TaskStatusEnum(),
             'filter.title' => "string|min:1|max:255",
             'filter.priority.*.0' => "string|in:priority",
             'filter.priority.*.1' => "string|in:>=,<=,<,>",
-            'filter.priority.*.2' => "string|in:1,2,3,4,5",
+            'filter.priority.*.2' => "string|in:" . new TaskPriorityEnum(),
             'sort.priority' => "string|in:desc,asc",
             'sort.completed_at' => "string|in:desc,asc",
             'sort.created_at' => "string|in:desc,asc",
