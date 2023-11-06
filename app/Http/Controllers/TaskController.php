@@ -36,6 +36,7 @@ class TaskController extends Controller
     public function index(Request $request): TaskCollection | JsonResponse
     {
         try {
+            $this->authorize('viewAny', Task::class);
             $tasks = $this->taskInterface->getAll($request->only(['filter', 'sort']));
         } catch (InputException $inputException) {
             return response()->json(json_decode($inputException->getMessage()), 400);
@@ -57,6 +58,7 @@ class TaskController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
+            $this->authorize('create', Task::class);
             $task = $this->taskInterface->create($request->only(['title', 'parent_task_id', 'description']));
         } catch (InputException $inputException) {
             return response()->json(json_decode($inputException->getMessage()), 400);
@@ -76,6 +78,7 @@ class TaskController extends Controller
     public function show(int $taskId): TaskResource | JsonResponse
     {
         try {
+            $this->authorize('viewAny', Task::class);
             $task = $this->taskInterface->getOne($taskId);
         } catch (InputException $inputException) {
             return response()->json($inputException->getMessage(), 400);
@@ -98,6 +101,7 @@ class TaskController extends Controller
     public function update(Request $request, Task $task): JsonResponse
     {
         try{
+            $this->authorize('update', $task);
             $task = $this->taskInterface->update($request->only(['title', 'description', 'status', 'priority']), $task->getOriginal('id'));
         } catch (InputException $inputException) {
             return response()->json($inputException->getMessage(), 400);
@@ -119,6 +123,8 @@ class TaskController extends Controller
     public function destroy(int $taskId): JsonResponse
     {
         try{
+            $task = $this->taskInterface->getOne($taskId);
+            $this->authorize('delete', $task);
             $this->taskInterface->delete($taskId);
         } catch (InputException $inputException) {
             return response()->json($inputException->getMessage(), 400);
