@@ -42,7 +42,7 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function create(array $request): Task | Exception
+    public function create(array $request): Task
     {
         $validator = Validator::make($request, [
             'title' => "required|string|min:1|max:255",
@@ -60,7 +60,7 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function getOne(int $taskId): Task | Exception
+    public function getOne(int $taskId): Task
     {
         $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1|max:1000000"]);
         if ($validator->fails()) {
@@ -81,7 +81,7 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function update(array $request, int $taskId): Task | Exception
+    public function update(array $request, int $taskId): Task
     {
         $validator = Validator::make(array_merge($request, ['task_id' => $taskId]), [
             'task_id' => "required|integer|min:1|max:1000000",
@@ -135,7 +135,7 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function getAll(array $request): Collection | Exception
+    public function getAll(array $request): Collection
     {
         $validator = Validator::make($request, [
             'filter.status' => "string|in:" . new TaskStatusEnum(),

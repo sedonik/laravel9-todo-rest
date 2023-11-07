@@ -14,22 +14,22 @@ interface TaskInterface
 {
     /**
      * @param int $taskId
-     * @return Task|Exception
+     * @return Task
      */
-    public function getOne(int $taskId): Task | Exception;
+    public function getOne(int $taskId): Task;
 
     /**
      * @param array $request
-     * @return Task|Exception
+     * @return Task
      */
-    public function create(array $request): Task | Exception;
+    public function create(array $request): Task;
 
     /**
      * @param array $request
      * @param int $taskId
-     * @return Task|Exception
+     * @return Task
      */
-    public function update(array $request, int $taskId): Task | Exception;
+    public function update(array $request, int $taskId): Task;
 
     /**
      * @param int $taskId
@@ -39,7 +39,7 @@ interface TaskInterface
 
     /**
      * @param array $request
-     * @return Collection|Exception
+     * @return Collection
      */
-    public function getAll(array $request): Collection | Exception;
+    public function getAll(array $request): Collection;
 }
