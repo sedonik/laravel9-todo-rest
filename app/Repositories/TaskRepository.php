@@ -47,7 +47,7 @@ class TaskRepository implements TaskInterface
         $validator = Validator::make($request, [
             'title' => "required|string|min:1|max:255",
             'description' => "required|string|min:1|max:2000",
-            'parent_task_id' => "required|integer|min:1|max:1000000"
+            'parent_task_id' => "required|integer|min:1"
         ]);
 
         if ($validator->fails()) {
@@ -62,7 +62,7 @@ class TaskRepository implements TaskInterface
      */
     public function getOne(int $taskId): Task
     {
-        $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1|max:1000000"]);
+        $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1"]);
         if ($validator->fails()) {
             throw new InputException($validator->errors()->first('task_id'));
         }
@@ -84,7 +84,7 @@ class TaskRepository implements TaskInterface
     public function update(array $request, int $taskId): Task
     {
         $validator = Validator::make(array_merge($request, ['task_id' => $taskId]), [
-            'task_id' => "required|integer|min:1|max:1000000",
+            'task_id' => "required|integer|min:1",
             'title' => "required|string|min:1|max:255",
             'description' => "required|string|min:1|max:2000",
             'status' => "string|in:" . new TaskStatusEnum(),
@@ -116,7 +116,7 @@ class TaskRepository implements TaskInterface
      */
     public function delete(int $taskId): void
     {
-        $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1|max:1000000"]);
+        $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1"]);
         if ($validator->fails()) {
             throw new InputException($validator->errors()->first('task_id'));
         }
