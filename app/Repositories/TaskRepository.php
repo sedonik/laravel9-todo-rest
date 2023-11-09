@@ -152,10 +152,19 @@ class TaskRepository implements TaskInterface
             throw new InputException($validator->errors());
         }
 
-        $tasks = Task::where('user_id', '=', $this->userId)
-            ->orderBy("priority", $request['sort']['priority'] ?? 'asc')
-            ->orderBy("completed_at", $request['sort']['completed_at'] ?? 'asc')
-            ->orderBy("created_at", $request['sort']['created_at'] ?? 'asc');
+        $tasks = Task::where('user_id', '=', $this->userId);
+
+        if (isset($request['sort']['priority'])) {
+            $tasks->orderBy($request['sort']['priority']);
+        }
+
+        if (isset($request['sort']['completed_at'])) {
+            $tasks->orderBy($request['sort']['completed_at']);
+        }
+
+        if (isset($request['sort']['created_at'])) {
+            $tasks->orderBy($request['sort']['created_at']);
+        }
 
         if (isset($request['filter']['priority'])) {
             $tasks->where($request['filter']['priority']);
