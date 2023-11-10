@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('parent_task_id')->nullable()->default(null);;
+            $table->unsignedInteger('parent_task_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->string('status', 32)->default(TaskStatusEnum::TODO);
             $table->unsignedTinyInteger('priority')->default(TaskPriorityEnum::FAILED);
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->fullText('title');
             $table->index(['completed_at', 'created_at']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('parent_task_id')->references('id')->on('tasks')->onDelete('cascade');
         });
     }
 
