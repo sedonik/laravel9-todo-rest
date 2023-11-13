@@ -44,16 +44,6 @@ class TaskRepository implements TaskInterface
      */
     public function create(array $request): Task
     {
-        $validator = Validator::make($request, [
-            'title' => "required|string|min:1|max:255",
-            'description' => "required|string|min:1|max:2000",
-            'parent_task_id' => "required|integer|min:1"
-        ]);
-
-        if ($validator->fails()) {
-            throw new InputException($validator->errors());
-        }
-
         return Task::create(array_merge($request, ['user_id' => $this->userId]));
     }
 

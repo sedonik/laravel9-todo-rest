@@ -10,6 +10,7 @@ use App\Interfaces\TaskInterface;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\TaskPostRequest;
 
 /**
  * class TaskController
@@ -52,12 +53,13 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param TaskPostRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(TaskPostRequest $request): JsonResponse
     {
         try {
+            $request->validated();
             $this->authorize('create', Task::class);
             $task = $this->taskInterface->create($request->only(['title', 'parent_task_id', 'description']));
         } catch (InputException $inputException) {
