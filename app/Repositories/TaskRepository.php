@@ -75,8 +75,6 @@ class TaskRepository implements TaskInterface
     {
         $validator = Validator::make(array_merge($request, ['task_id' => $taskId]), [
             'task_id' => "required|integer|min:1",
-            'title' => "required|string|min:1|max:255",
-            'description' => "required|string|min:1|max:2000",
             'status' => "string|in:" . new TaskStatusEnum(),
             'priority' => "string|in:" . new TaskPriorityEnum()
         ]);
