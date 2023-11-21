@@ -2,8 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TaskPriorityEnum;
+use App\Enums\TaskStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * class TaskPostRequest
+ */
 class TaskPostRequest extends FormRequest
 {
     /**
@@ -14,9 +19,11 @@ class TaskPostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => "required|string|min:1|max:255",
-            'description' => "required|string|min:1|max:2000",
-            'parent_task_id' => "required|integer|min:1"
+            "title" => "required|string|min:1|max:255",
+            "description" => "required|string|min:1|max:2000",
+            "parent_task_id" => "integer|min:1",
+            "status" => "string|in:" . new TaskStatusEnum(),
+            "priority" => "integer|in:" . new TaskPriorityEnum()
         ];
     }
 }
