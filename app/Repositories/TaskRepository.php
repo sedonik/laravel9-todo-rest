@@ -44,16 +44,6 @@ class TaskRepository implements TaskInterface
      */
     public function create(array $request): Task
     {
-        $validator = Validator::make($request, [
-            'title' => "required|string|min:1|max:255",
-            'description' => "required|string|min:1|max:2000",
-            'parent_task_id' => "required|integer|min:1"
-        ]);
-
-        if ($validator->fails()) {
-            throw new InputException($validator->errors());
-        }
-
         return Task::create(array_merge($request, ['user_id' => $this->userId]));
     }
 
@@ -62,11 +52,6 @@ class TaskRepository implements TaskInterface
      */
     public function getOne(int $taskId): Task
     {
-        $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1"]);
-        if ($validator->fails()) {
-            throw new InputException($validator->errors()->first('task_id'));
-        }
-
         $task = Task::where('id', $taskId)
             ->where('user_id', $this->userId)
             ->first();
@@ -83,17 +68,6 @@ class TaskRepository implements TaskInterface
      */
     public function update(array $request, int $taskId): Task
     {
-        $validator = Validator::make(array_merge($request, ['task_id' => $taskId]), [
-            'task_id' => "required|integer|min:1",
-            'title' => "required|string|min:1|max:255",
-            'description' => "required|string|min:1|max:2000",
-            'status' => "string|in:" . new TaskStatusEnum(),
-            'priority' => "string|in:" . new TaskPriorityEnum()
-        ]);
-        if ($validator->fails()) {
-            throw new InputException($validator->errors());
-        }
-
         $task = Task::where('id', '=', $taskId)
             ->where('user_id', $this->userId)
             ->first();
@@ -116,11 +90,6 @@ class TaskRepository implements TaskInterface
      */
     public function delete(int $taskId): void
     {
-        $validator = Validator::make(['task_id' => $taskId], ['task_id' => "required|integer|min:1"]);
-        if ($validator->fails()) {
-            throw new InputException($validator->errors()->first('task_id'));
-        }
-
         $task = Task::where('id', '=', $taskId)
             ->where('user_id', $this->userId)
             ->first();
@@ -137,21 +106,6 @@ class TaskRepository implements TaskInterface
      */
     public function getAll(array $request): Collection
     {
-        $validator = Validator::make($request, [
-            'filter.status' => "string|in:" . new TaskStatusEnum(),
-            'filter.title' => "string|min:1|max:255",
-            'filter.priority.*.0' => "string|in:priority",
-            'filter.priority.*.1' => "string|in:>=,<=,<,>",
-            'filter.priority.*.2' => "string|in:" . new TaskPriorityEnum(),
-            'sort.priority' => "string|in:desc,asc",
-            'sort.completed_at' => "string|in:desc,asc",
-            'sort.created_at' => "string|in:desc,asc",
-        ]);
-
-        if ($validator->fails()) {
-            throw new InputException($validator->errors());
-        }
-
         $tasks = Task::where('user_id', '=', $this->userId);
 
         if (isset($request['sort']['priority'])) {

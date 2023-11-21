@@ -10,6 +10,8 @@ use App\Interfaces\TaskInterface;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\TaskPostRequest;
+use App\Http\Requests\TaskAllRequest;
 
 /**
  * class TaskController
@@ -30,10 +32,10 @@ class TaskController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param TaskAllRequest $request
      * @return TaskCollection | JsonResponse
      */
-    public function index(Request $request): TaskCollection | JsonResponse
+    public function index(TaskAllRequest $request): TaskCollection | JsonResponse
     {
         try {
             $this->authorize('viewAny', Task::class);
@@ -52,10 +54,10 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
+     * @param TaskPostRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(TaskPostRequest $request): JsonResponse
     {
         try {
             $this->authorize('create', Task::class);
@@ -94,11 +96,11 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
+     * @param TaskPostRequest $request
      * @param Task $task
      * @return JsonResponse
      */
-    public function update(Request $request, Task $task): JsonResponse
+    public function update(TaskPostRequest $request, Task $task): JsonResponse
     {
         try{
             $this->authorize('update', $task);
