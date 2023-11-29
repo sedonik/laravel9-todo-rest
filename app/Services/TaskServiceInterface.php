@@ -1,28 +1,26 @@
 <?php
+declare(strict_types=1);
 
-namespace App\Interfaces;
+namespace App\Services;
 
+use App\Exceptions\TaskNotFoundException;
 use App\Models\Task;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 
-/**
- * interface TaskInterface
- */
-interface TaskInterface
+interface TaskServiceInterface
 {
-    /**
-     * @param int $taskId
-     * @return Task
-     */
-    public function getOne(int $taskId): Task;
-
     /**
      * @param array $request
      * @return Task
      */
     public function create(array $request): Task;
+
+    /**
+     * @param int $taskId
+     * @return Task
+     * @throws TaskNotFoundException
+     */
+    public function getOne(int $taskId): Task;
 
     /**
      * @param array $request
@@ -43,3 +41,4 @@ interface TaskInterface
      */
     public function getAll(array $request): Collection;
 }
+

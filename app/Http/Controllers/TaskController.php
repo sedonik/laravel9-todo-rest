@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\InputException;
 use App\Exceptions\TaskNotFoundException;
+use App\Http\Requests\TaskAllRequest;
+use App\Http\Requests\TaskPostRequest;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
-use App\Interfaces\TaskInterface;
 use App\Models\Task;
-use Illuminate\Http\Request;
+use App\Services\TaskServiceInterface;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\TaskPostRequest;
-use App\Http\Requests\TaskAllRequest;
 
 /**
  * class TaskController
@@ -19,16 +18,16 @@ use App\Http\Requests\TaskAllRequest;
 class TaskController extends Controller
 {
     /**
-     * @var TaskInterface
+     * @var TaskServiceInterface $taskServiceInterface
      */
-    private $taskInterface;
+    private $taskServiceInterface;
 
     /**
-     * @param TaskInterface $taskInterface
+     * @param TaskServiceInterface $taskServiceInterface
      */
-    public function __construct(TaskInterface $taskInterface)
+    public function __construct(TaskServiceInterface $taskServiceInterface)
     {
-        $this->taskInterface = $taskInterface;
+        $this->taskServiceInterface = $taskServiceInterface;
     }
 
     /**
@@ -39,7 +38,7 @@ class TaskController extends Controller
     {
         try {
             $this->authorize('viewAny', Task::class);
-            $tasks = $this->taskInterface->getAll($request->only(['filter', 'sort']));
+            $tasks = $this->taskServiceInterface->getAll($request->only(['filter', 'sort']));
         } catch (InputException $inputException) {
             return response()->json(json_decode($inputException->getMessage()), 400);
         } catch (TaskNotFoundException $notFoundException) {
@@ -61,7 +60,7 @@ class TaskController extends Controller
     {
         try {
             $this->authorize('create', Task::class);
-            $task = $this->taskInterface->create($request->only(['title', 'parent_task_id', 'description']));
+            $task = $this->taskServiceInterface->create($request->only(['title', 'parent_task_id', 'description']));
         } catch (InputException $inputException) {
             return response()->json(json_decode($inputException->getMessage()), 400);
         } catch (\Exception $exception) {
@@ -81,7 +80,7 @@ class TaskController extends Controller
     {
         try {
             $this->authorize('viewAny', Task::class);
-            $task = $this->taskInterface->getOne($taskId);
+            $task = $this->taskServiceInterface->getOne($taskId);
         } catch (InputException $inputException) {
             return response()->json($inputException->getMessage(), 400);
         } catch (TaskNotFoundException $notFoundException) {
@@ -104,7 +103,7 @@ class TaskController extends Controller
     {
         try{
             $this->authorize('update', $task);
-            $task = $this->taskInterface->update($request->only(['title', 'description', 'status', 'priority']), $task->getOriginal('id'));
+            $task = $this->taskServiceInterface->update($request->only(['title', 'description', 'status', 'priority']), $task->getOriginal('id'));
         } catch (InputException $inputException) {
             return response()->json($inputException->getMessage(), 400);
         } catch (TaskNotFoundException $notFoundException) {
@@ -125,9 +124,9 @@ class TaskController extends Controller
     public function destroy(int $taskId): JsonResponse
     {
         try{
-            $task = $this->taskInterface->getOne($taskId);
+            $task = $this->taskServiceInterface->getOne($taskId);
             $this->authorize('delete', $task);
-            $this->taskInterface->delete($taskId);
+            $this->taskServiceInterface->delete($taskId);
         } catch (InputException $inputException) {
             return response()->json($inputException->getMessage(), 400);
         } catch (TaskNotFoundException $notFoundException) {
