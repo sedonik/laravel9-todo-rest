@@ -4,72 +4,41 @@ namespace App\Repositories;
 
 use App\Enums\TaskStatus;
 use App\Exceptions\TaskNotFoundException;
-use App\Interfaces\TaskInterface;
 use App\Models\Task;
-use Symfony\Component\HttpFoundation\Session\Session;
-use App\Exceptions\InputException;
-use Illuminate\Support\Facades\Validator;
-use App\Enums\TaskStatusEnum;
-use App\Enums\TaskPriorityEnum;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
  * class TaskRepository
  */
-class TaskRepository implements TaskInterface
+class TaskRepository implements TaskRepositoryInterface
 {
-    /**
-     * @var numeric
-     */
-    protected $userId = 0;
-
-    /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
-     * @param Session $session
-     */
-    public function __construct(
-        Session $session
-    ) {
-        $this->session = $session;
-        $this->userId = $this->session->get('user_id');
-    }
-
     /**
      * @inheritdoc
      */
     public function create(array $request): Task
     {
-        return Task::create(array_merge($request, ['user_id' => $this->userId]));
+        return Task::create($request);
     }
 
     /**
      * @inheritdoc
      */
-    public function getOne(int $taskId): Task
+    public function getOneByUserId(int $taskId, int $userId): ?Task
     {
         $task = Task::where('id', $taskId)
-            ->where('user_id', $this->userId)
+            ->where('user_id', $userId)
             ->first();
 
-        if (!$task) {
-            throw new TaskNotFoundException("Task: {$taskId} was not found for User: {$this->userId}");
-        }
-
-        return $task;
+        return $task ?: null;
     }
 
     /**
      * @inheritdoc
      */
-    public function update(array $request, int $taskId): Task
+    public function updateByUserId(array $request, int $taskId, int $userId): Task
     {
         $task = Task::where('id', '=', $taskId)
-            ->where('user_id', $this->userId)
+            ->where('user_id', $userId)
             ->first();
 
         if (!$task) {
@@ -88,15 +57,11 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function delete(int $taskId): void
+    public function deleteByUserId(int $taskId, int $userId): void
     {
         $task = Task::where('id', '=', $taskId)
-            ->where('user_id', $this->userId)
+            ->where('user_id', $userId)
             ->first();
-
-        if (!$task) {
-            throw new TaskNotFoundException("Task: {$taskId} was not found for User: {$this->userId}");
-        }
 
         $task->delete();
     }
@@ -104,9 +69,9 @@ class TaskRepository implements TaskInterface
     /**
      * @inheritdoc
      */
-    public function getAll(array $request): Collection
+    public function getAllByUserId(array $request, int $userId): Collection
     {
-        $tasks = Task::where('user_id', '=', $this->userId);
+        $tasks = Task::where('user_id', '=', $userId);
 
         if (isset($request['sort']['priority'])) {
             $tasks->orderBy($request['sort']['priority']);
@@ -120,16 +85,16 @@ class TaskRepository implements TaskInterface
             $tasks->orderBy($request['sort']['created_at']);
         }
 
+        if (isset($request['filter']['status'])) {
+            $tasks->where(['status' => $request['filter']['status']]);
+        }
+
         if (isset($request['filter']['priority'])) {
             $tasks->where($request['filter']['priority']);
         }
 
         if (isset($request['filter']['title'])) {
             $tasks->whereRaw("(MATCH (title) AGAINST (? IN BOOLEAN MODE))" , [$request['filter']['title']]);
-        }
-
-        if (empty($tasks->get()->toArray())) {
-            throw new TaskNotFoundException("Was not found any task for User: {$this->userId}");
         }
 
         return $tasks->get();
