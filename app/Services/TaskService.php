@@ -67,9 +67,13 @@ class TaskService implements TaskServiceInterface
      */
     public function update(array $request, int $taskId): Task
     {
-        $task = $this->taskRepository->updateByUserId($request, $taskId, $this->userId);
+        $task = $this->taskRepository->getOneByUserId($taskId, $this->userId);
 
-        return $task;
+        if (!$task) {
+            throw new TaskNotFoundException("Task: {$taskId} was not found for User: {$this->userId}");
+        }
+
+        return $this->taskRepository->update($task, $request);
     }
 
     /**
@@ -77,10 +81,13 @@ class TaskService implements TaskServiceInterface
      */
     public function delete(int $taskId): void
     {
-        $this->taskRepository->deleteByUserId($taskId, $this->userId);
+        $task = $this->taskRepository->getOneByUserId($taskId, $this->userId);
 
-        throw new \Exception("Task: {$taskId} was deleted");
+        if (!$task) {
+            throw new TaskNotFoundException("Task: {$taskId} was not found for User: {$this->userId}");
+        }
 
+        $this->taskRepository->delete($task);
     }
 
     /**
@@ -96,6 +103,4 @@ class TaskService implements TaskServiceInterface
 
         return $tasks;
     }
-
-
 }

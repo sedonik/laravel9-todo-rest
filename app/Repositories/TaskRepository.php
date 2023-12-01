@@ -35,16 +35,8 @@ class TaskRepository implements TaskRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function updateByUserId(array $request, int $taskId, int $userId): Task
+    public function update(Task $task, array $request): Task
     {
-        $task = Task::where('id', '=', $taskId)
-            ->where('user_id', $userId)
-            ->first();
-
-        if (!$task) {
-            throw new TaskNotFoundException("Task: {$taskId} was not found for User: {$this->userId}");
-        }
-
         $task['title'] = $request['title'];
         $task['description'] = $request['description'];
         $task['status'] = $request['status'];
@@ -57,12 +49,8 @@ class TaskRepository implements TaskRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function deleteByUserId(int $taskId, int $userId): void
+    public function delete(Task $task): void
     {
-        $task = Task::where('id', '=', $taskId)
-            ->where('user_id', $userId)
-            ->first();
-
         $task->delete();
     }
 
@@ -99,5 +87,4 @@ class TaskRepository implements TaskRepositoryInterface
 
         return $tasks->get();
     }
-
 }

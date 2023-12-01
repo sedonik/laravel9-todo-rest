@@ -24,19 +24,18 @@ interface TaskRepositoryInterface
     public function create(array $request): Task;
 
     /**
+     * @param Task $task
      * @param array $request
-     * @param int $taskId
-     * @param int $userId
      * @return Task
      */
-    public function updateByUserId(array $request, int $taskId, int $userId): Task;
+    public function update(Task $task, array $request): Task;
 
     /**
      * @param int $taskId
      * @param int $userId
      * @return void
      */
-    public function deleteByUserId(int $taskId, int $userId): void;
+    public function delete(Task $task): void;
 
     /**
      * @param array $request
