@@ -19,11 +19,11 @@ class TaskAllRequest extends FormRequest
     public function rules(): array
     {
         return  [
-            "filter.status" => "string|in:" . new TaskStatusEnum(),
+            "filter.status" => "string|in:" . implode(',', array_column(TaskStatusEnum::cases(), 'value')),
             "filter.title" => "string|min:1|max:255",
             "filter.priority.*.0" => "string|in:priority",
             "filter.priority.*.1" => "string|in:>=,<=,<,>",
-            "filter.priority.*.2" => "string|in:" . new TaskPriorityEnum(),
+            "filter.priority.*.2" => "string|in:" . implode(',', array_column(TaskPriorityEnum::cases(), 'value')),
             "sort.priority" => "string|in:desc,asc",
             "sort.completed_at" => "string|in:desc,asc",
             "sort.created_at" => "string|in:desc,asc"

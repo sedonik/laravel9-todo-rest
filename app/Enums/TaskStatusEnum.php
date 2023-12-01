@@ -5,8 +5,8 @@ namespace App\Enums;
 /**
  * TaskStatusEnum enum
  */
-class TaskStatusEnum extends BaseEnum
+enum TaskStatusEnum: string
 {
-    public const TODO = 'todo';
-    public const DONE = 'done';
+    case TODO = 'todo';
+    case DONE = 'done';
 }
