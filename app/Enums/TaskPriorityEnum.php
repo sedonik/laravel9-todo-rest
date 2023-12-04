@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -7,6 +8,8 @@ namespace App\Enums;
  */
 enum TaskPriorityEnum: int
 {
+    use \App\Enums\BaseEnum;
+
     case NEW = 1;
     case IN_PROGRESS = 2;
     case UPDATED = 3;

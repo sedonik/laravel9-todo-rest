@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Enums;
 
@@ -7,6 +8,8 @@ namespace App\Enums;
  */
 enum TaskStatusEnum: string
 {
+    use \App\Enums\BaseEnum;
+
     case TODO = 'todo';
     case DONE = 'done';
 }
