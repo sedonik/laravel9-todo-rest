@@ -22,8 +22,8 @@ class TaskPostRequest extends FormRequest
             "title" => "required|string|min:1|max:255",
             "description" => "required|string|min:1|max:2000",
             "parent_task_id" => "integer|min:1",
-            "status" => "string|in:" . new TaskStatusEnum(),
-            "priority" => "integer|in:" . new TaskPriorityEnum()
+            "status" => "string|in:" . TaskStatusEnum::getImplodedList(),
+            "priority" => "integer|in:" . TaskPriorityEnum::getImplodedList()
         ];
     }
 }

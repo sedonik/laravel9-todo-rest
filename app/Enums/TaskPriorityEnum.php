@@ -1,48 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Enums;
 
 /**
  * TaskPriorityEnum enum
  */
-class TaskPriorityEnum extends BaseEnum
+enum TaskPriorityEnum: int
 {
-    /**
-     * const NEW
-     */
-    public const NEW = 1;
+    use \App\Enums\BaseEnum;
 
-    /**
-     * const IN_PROGRESS
-     */
-    public const IN_PROGRESS = 2;
-
-    /**
-     * const UPDATED
-     */
-    public const UPDATED = 3;
-
-    /**
-     * const COMPLETED
-     */
-    public const COMPLETED = 4;
-
-    /**
-     * const FAILED
-     */
-    public const FAILED = 5;
-
-    /**
-     * @return string[]
-     */
-    public static function map(): array
-    {
-        return [
-            static::NEW => 'New',
-            static::IN_PROGRESS => 'In progress',
-            static::UPDATED => 'Updated',
-            static::COMPLETED => 'Completed',
-            static::FAILED => 'Failed'
-        ];
-    }
+    case NEW = 1;
+    case IN_PROGRESS = 2;
+    case UPDATED = 3;
+    case COMPLETED = 4;
+    case FAILED = 5;
 }

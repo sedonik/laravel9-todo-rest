@@ -1,12 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Enums;
 
 /**
  * TaskStatusEnum enum
  */
-class TaskStatusEnum extends BaseEnum
+enum TaskStatusEnum: string
 {
-    public const TODO = 'todo';
-    public const DONE = 'done';
+    use \App\Enums\BaseEnum;
+
+    case TODO = 'todo';
+    case DONE = 'done';
 }

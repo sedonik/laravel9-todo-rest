@@ -1,28 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Enums;
 
-/**
- * class BaseEnum
- */
-class BaseEnum
+trait BaseEnum
 {
-    /**
-     * Returns class constant values
-     * @return array
-     */
-    public static function toArray(): array
-    {
-        $class = new \ReflectionClass(static::class);
-
-        return array_values($class->getConstants());
-    }
-
     /**
      * @return string
      */
-    public function __toString(): string
+    public static function getImplodedList(): string
     {
-        return implode(',', static::toArray());
+        return implode(',', array_column(static::cases(), 'value'));
     }
 }

@@ -45,7 +45,7 @@ class TaskService implements TaskServiceInterface
      */
     public function create(array $request): Task
     {
-        return $this->taskRepository->create(array_merge($request, ['user_id' => $this->userId]));
+        return $this->taskRepository->create(['user_id' => $this->userId, ...$request]);
     }
 
     /**
