@@ -1,6 +1,7 @@
 ## Build simple Rest apps in Laravel
 
-It's implemented a simple Rest API Endpoint "/tasks":
+This API point is implemented as an Example of Rest API Endpoint "/tasks":
+(implemented for representing framework capabilities)
 
 ### There are some classes that have the following functionality:
 
