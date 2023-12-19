@@ -8,6 +8,7 @@ use App\Models\Task;
 use Illuminate\Database\Eloquent\Collection;
 use Symfony\Component\HttpFoundation\Session\Session;
 use App\Repositories\TaskRepositoryInterface;
+use App\Enums\TaskStatusEnum;
 
 class TaskService implements TaskServiceInterface
 {
@@ -85,6 +86,10 @@ class TaskService implements TaskServiceInterface
 
         if (!$task) {
             throw new TaskNotFoundException("Task: {$taskId} was not found for User: {$this->userId}");
+        }
+
+        if ($task['status'] == TaskStatusEnum::DONE->value) {
+            throw new \Exception("The task with the status DONE can't be deleted.");
         }
 
         $this->taskRepository->delete($task);
